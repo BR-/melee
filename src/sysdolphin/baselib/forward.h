@@ -148,4 +148,7 @@ typedef enum PObjSetupFlag {
 #define LOBJ_LIGHT_ATTN_NONE 0
 #define LOBJ_LIGHT_ATTN 1
 
+
+typedef struct HSD_GObj Fighter_GObj;
+
 #endif

@@ -118,6 +118,8 @@ def pointer(type: CType) -> CType:
 
 
 def resolve_typedefs(type: CType, typemap: TypeMap) -> CType:
+    if isinstance(type, TypeDecl) and type.declname == "Fighter_GObj":
+        return TypeDecl(declname="Fighter_GObj", quals=[], align=None, type=ca.Struct(name="Fighter_GObj", decls=None))
     while (
         isinstance(type, TypeDecl)
         and isinstance(type.type, IdentifierType)
@@ -439,8 +441,25 @@ def parse_struct(struct: Union[ca.Struct, ca.Union], typemap: TypeMap) -> Struct
     ret = do_parse_struct(struct, typemap)
     if struct.name:
         typemap.structs[struct.name] = ret
+        if struct.name == "HSD_GObj":
+            parse_struct(make_gobj(struct, "Fighter", typemap), typemap)
     typemap.structs[struct] = ret
     return ret
+
+
+def make_gobj(struct: ca.Struct, new_type: str, typemap: TypeMap) -> ca.Struct:
+    c_code = to_c(struct) + ";"
+    c_code = c_code.replace(
+        "  void *user_data;",
+        f"  {new_type} *user_data;")
+    c_code = c_code.replace(
+        "struct HSD_GObj\n",
+        f"struct {new_type}_GObj\n", 1)
+    ast = parse_c(c_code, typemap.cparser_scope)
+    new_struct = ast[0].ext[0].type
+    if isinstance(new_struct, ca.Struct) and new_struct.name == f"{new_type}_GObj":
+        return new_struct
+    1/0
 
 
 def parse_struct_member(
