@@ -2958,25 +2958,25 @@ jtbl_803C08DC:
     .balign 8
 .global ftAction_804D82A0
 ftAction_804D82A0:
-    .4byte 0x3B7FFBCE
+    .4byte 0x3B7FFBCE	#0.003906f
     .4byte 0x00000000
 .global ftAction_804D82A8
 ftAction_804D82A8:
-    .4byte 0x43300000
+    .4byte 0x43300000	#float conversion
     .4byte 0x00000000
 .global ftAction_804D82B0
 ftAction_804D82B0:
-    .4byte 0x43300000
+    .4byte 0x43300000	#float conversion
     .4byte 0x80000000
 .global ftAction_804D82B8
 ftAction_804D82B8:
-    .4byte 0x00000000
+    .4byte 0x00000000	#0.0f
 .global ftAction_804D82BC
 ftAction_804D82BC:
-    .4byte 0x3F800000
+    .4byte 0x3F800000	#1.0f
 .global ftAction_804D82C0
 ftAction_804D82C0:
-    .4byte 0xBF800000
+    .4byte 0xBF800000	#-1.0f
 .global ftAction_804D82C4
 ftAction_804D82C4:
-    .4byte 0x7F7FFFFF
+    .4byte 0x7F7FFFFF	#??? 3.40282e+38
