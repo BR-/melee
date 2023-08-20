@@ -175,7 +175,7 @@ DUMMY != mkdir -p $(ALL_DIRS)
 	@echo Converting $< to $@
 	$(QUIET) $(ELF2DOL) $< $@
 ifeq ($(GENERATE_MAP),1)
-	$(QUIET) $(PYTHON) tools/calcprogress/calcprogress.py --dol $(DOL) --map $(MAP) --asm-obj-ext .s.o --old-map true
+	$(QUIET) $(PYTHON) tools/calcprogress/calcprogress.py --dol $(DOL) --map $(MAP) --asm-obj-ext .o --old-map true
 endif
 
 # ELF creation makefile instructions
@@ -184,22 +184,22 @@ $(ELF): $(O_FILES) $(LDSCRIPT)
 	$(file >build/o_files, $(O_FILES))
 	$(QUIET) $(LD) $(LDFLAGS) -o $@ -lcf $(LDSCRIPT) @build/o_files
 
-$(BUILD_DIR)/%.s.o: %.s
+$(BUILD_DIR)/%.o: %.s
 	@echo Assembling $<
 	$(QUIET) $(AS) $(ASFLAGS) -o $@ $<
 
-$(BUILD_DIR)/%.c.dep: %.c
+$(BUILD_DIR)/%.dep: %.c
 	$(QUIET) $(HOSTCC) -E $(addprefix -I ,$(INCLUDE_DIRS) $(SYSTEM_INCLUDE_DIRS)) -MMD -MF $(@:.o=.dep) \
 		-MT "$(BUILD_DIR)/$<.o" $< >/dev/null
 
-$(BUILD_DIR)/%.c.o: %.c $(BUILD_DIR)/%.c.dep
+$(BUILD_DIR)/%.o: %.c $(BUILD_DIR)/%.dep
 	@echo "Compiling " $<
 	$(QUIET) $(CC) $(CFLAGS) -c -o $@ $<
 
-$(BUILD_DIR)/src/melee/%.c.o: CC := $(CC_EPI)
-$(BUILD_DIR)/src/sysdolphin/%.c.o: CC := $(CC_EPI)
-$(BUILD_DIR)/src/dolphin/card/%.c.o: CC := $(CC_EPI)
-$(BUILD_DIR)/src/dolphin/pad/%.c.o: CC := $(CC_EPI)
+$(BUILD_DIR)/src/melee/%.o: CC := $(CC_EPI)
+$(BUILD_DIR)/src/sysdolphin/%.o: CC := $(CC_EPI)
+$(BUILD_DIR)/src/dolphin/card/%.o: CC := $(CC_EPI)
+$(BUILD_DIR)/src/dolphin/pad/%.o: CC := $(CC_EPI)
 
 -include $(DEP_FILES)
 
