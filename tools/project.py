@@ -403,6 +403,20 @@ def generate_build_ninja(
     )
     n.newline()
 
+    n.comment("Context generation")
+    n.rule(
+        name="ctx_gen",
+        command="pipenv run python tools/m2ctx/m2ctx.py -qfrp",
+        description="CTX",
+    )
+    n.build(
+        outputs=None,
+        rule="ctx_gen",
+        implicit=path([*config.src_dir.rglob("*.h")]),
+        implicit_outputs=path([config.build_dir / "ctx.c", config.build_dir / "ctx.h", config.build_dir / "ctx.html"]),
+    )
+    n.newline()
+
     ###
     # Source files
     ###
@@ -898,10 +912,22 @@ def generate_objdiff_config(
                         reverse_fn_order = True
                     elif value == "nodeferred":
                         reverse_fn_order = False
+            str_cflags = " ".join(cflags)
+        elif type(cflags) is str:
+            str_cflags = cflags
+        else:
+            str_cflags = None
 
         unit_config["base_path"] = src_obj_path
         unit_config["reverse_fn_order"] = reverse_fn_order
         unit_config["complete"] = obj.completed
+        unit_config["scratch"] = {
+            "platform": "PowerPC",
+            "compiler": "mwcc_233_163n",
+            "c_flags": str_cflags,
+            "ctx_path": "build/ctx.h",
+            "build_ctx": True,
+        }
         objdiff_config["units"].append(unit_config)
 
     # Add DOL units
