@@ -381,6 +381,7 @@ import html
 import itertools
 import json
 import os
+import platform
 import queue
 import re
 import string
@@ -399,7 +400,8 @@ MISSING_PREREQUISITES = (
 
 try:
     import watchdog
-    from colorama import Back, Fore, Style
+    from colorama import Back, Fore, Style, just_fix_windows_console
+    just_fix_windows_console()
 except ModuleNotFoundError as e:
     fail(MISSING_PREREQUISITES.format(e.name))
 
@@ -3599,7 +3601,10 @@ class Display:
             self.less_proc = None
             if ret != 0:
                 # fix the terminal
-                os.system("tput reset")
+                if platform.system() == "Windows":
+                    os.system("cls")
+                else:
+                    os.system("tput reset")
             if ret != 0 and self.pending_update is not None:
                 # killed by program with the intent to refresh
                 output = self.pending_update

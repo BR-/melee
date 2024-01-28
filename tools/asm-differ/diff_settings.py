@@ -1,4 +1,5 @@
 import os
+import sys
 import platform
 from typing import Optional
 
@@ -28,7 +29,12 @@ def apply(config, _):
     config["make_command"] = ["ninja"]
 
     # TODO gc-wii-binutils
-    devkitpro = env("DEVKITPRO", "/opt/devkitpro")
-    devkitppc = env("DEVKITPPC", f"{devkitpro}/devkitPPC")
-    objdump = f"{devkitppc}/bin/powerpc-eabi-objdump{get_exe_suffix()}"
+    objdump = f"tools/mwcc_compiler/powerpc-eabi-objdump{get_exe_suffix()}"
+    if not os.path.exists(objdump):
+        devkitpro = env("DEVKITPRO", "/opt/devkitpro")
+        devkitppc = env("DEVKITPPC", f"{devkitpro}/devkitPPC")
+        objdump = f"{devkitppc}/bin/powerpc-eabi-objdump{get_exe_suffix()}"
+    if not os.path.exists(objdump):
+        print(f"ERROR: could not find powerpc-eabi-objdump{get_exe_suffix()}", file=sys.stderr)
+        sys.exit(1)
     config["objdump_executable"] = objdump
