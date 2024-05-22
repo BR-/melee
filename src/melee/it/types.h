@@ -719,7 +719,7 @@ struct x1C_struct {
 };
 
 struct HSD_ObjAllocUnk {
-    s32 x0;
+    u32 x0;
     s32 x4;
     s32 x8;
     s32 xC;

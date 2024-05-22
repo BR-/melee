@@ -7,7 +7,7 @@
 #include <dolphin/os/OSContext.h>
 
 typedef void (*ReportCallback)(s32, s32);
-typedef void (*PanicCallback)(OSContext*, ...);
+typedef void (*PanicCallback)(OSContext*);
 typedef int (*LogFunc)(s32, s32, s32*, s32);
 
 ATTRIBUTE_NORETURN void __assert(char*, u32, char*);

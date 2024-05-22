@@ -2133,11 +2133,11 @@ melee/gr/stage.c:
 
 melee/db/db_2253.c:
 	.text       start:0x80225374 end:0x802295AC
-	.rodata     start:0x803B84D8 end:0x803B84E8
+	.rodata     start:0x803B84D8 end:0x803B84E4
 	.data       start:0x803EA6C8 end:0x803EAE68
 	.bss        start:0x8049FA00 end:0x804A04F0
 	.sdata      start:0x804D4A08 end:0x804D4B30
-	.sbss       start:0x804D6B20 end:0x804D6BA8
+	.sbss       start:0x804D6B20 end:0x804D6BA1
 	.sdata2     start:0x804DBCF0 end:0x804DBD88
 
 melee/mn/mn_2295.c:

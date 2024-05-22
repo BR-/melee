@@ -137,7 +137,13 @@ typedef struct OSContext {
     u32 ctr;      // at 0x88
     u32 xer;      // at 0x8C
     f64 fprs[32]; // at 0x90
-    f64 fpscr;    // at 0x190
+    union {
+        f64 fpscr; // at 0x190
+        struct {
+            u32 fpscr_padding;
+            u32 fpscr_u32;
+        };
+    };
     u32 srr0;     // at 0x198
     u32 srr1;     // at 0x19C
     u16 mode;     // at 0x1A0

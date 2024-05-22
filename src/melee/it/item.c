@@ -553,8 +553,6 @@ void Item_80267978(HSD_GObj* gobj)
     item_data->xBC_itemStateContainer = item_data->xB8_itemLogicTable->states;
 }
 
-extern UNK_T db_80225B20(void);
-
 static void Item_80267AA8(HSD_GObj* gobj, SpawnItem* spawnItem)
 {
     ItemAttr* item_attr;
@@ -709,7 +707,7 @@ static void Item_80267AA8(HSD_GObj* gobj, SpawnItem* spawnItem)
 
     item_data->xDAA_byte = 1;
 
-    if (db_80225B20() != NULL) {
+    if (db_80225B20() != 0) {
         item_data->xDAA_flag.bits.b4 = true;
     }
 

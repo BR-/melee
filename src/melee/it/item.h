@@ -2,7 +2,7 @@
 #define GALE01_266F3C
 
 #include <platform.h>
-#include "it/forward.h"
+#include "it/forward.h" // IWYU pragma: export
 #include <dolphin/mtx/forward.h>
 #include <baselib/forward.h>
 

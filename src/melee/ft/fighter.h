@@ -2,11 +2,12 @@
 #define GALE01_0679B0
 
 #include <platform.h>
+#include "ft/forward.h" // IWYU pragma: export
 #include <dolphin/mtx/forward.h>
 #include <baselib/forward.h>
 
 #include "ft/inlines.h" // IWYU pragma: export
-#include "ft/types.h"
+#include "ft/types.h"   // IWYU pragma: export
 
 #include <placeholder.h>
 #include <baselib/objalloc.h>

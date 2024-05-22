@@ -1388,8 +1388,8 @@ struct Fighter {
     /* fp+209A */ u16 x209A;
     /* fp+209C */ s16 x209C;
     /* fp+20A0 */ HSD_JObj* x20A0_accessory;
-    /* fp+20A4 */ s32 x20A4;
-    /* fp+20A8 */ s32 x20A8;
+    /* fp+20A4 */ UnkFlagStruct x20A4;
+    /* fp+20A8 */ u32 x20A8;
     /* fp+20AC */ HSD_GObj* unk_gobj;
     /* fp+20B0 */ UNK_T x20B0;
     /* fp+20B4 */ UNK_T x20B4;
@@ -1474,7 +1474,23 @@ struct Fighter {
     /* fp+21F0 */ HSD_GObjEvent x21F0;
     /* fp+21F4 */ HSD_GObjEvent x21F4;
     /* fp+21F8 */ HSD_GObjEvent x21F8;
-    /* fp+21FC */ UnkFlagStruct x21FC_flag;
+    /* fp+21FC */ union {
+        u8 u8;
+        struct {
+            u8 b0_to_5 : 6;
+            u8 b6_to_7 : 2;
+        } grouped_bits;
+        struct {
+            u8 b0 : 1;
+            u8 b1 : 1;
+            u8 b2 : 1;
+            u8 b3 : 1;
+            u8 b4 : 1;
+            u8 b5 : 1;
+            u8 b6 : 1;
+            u8 b7 : 1;
+        } bits;
+    } x21FC_flag;
     /* fp+21FC */ u8 filler_x21FC[0x2200 - 0x21FD];
     /* fp+2200 */ u32 cmd_vars[4];
     /* fp+2210 */ union {
@@ -1748,10 +1764,10 @@ struct UnkFloat6_Camera {
 };
 
 struct FtCmdState {
-    float x0;      // timer
-    float x4;      // frame
+    float x0; // timer
+    float x4; // frame
     union {
-        char* x8;      // script
+        char* x8; // script
         struct {
             union {
                 s16 x0;
