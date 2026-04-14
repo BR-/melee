@@ -9,6 +9,10 @@
 #include "lobj.h"
 #include "object.h"
 
+#include "dolphin/gx/GXEnum.h"
+
+extern int special_render_pass;
+
 u8 HSD_GObj_804D784B;
 s8 HSD_GObj_804D784A;
 u8 HSD_GObj_804D7849;
@@ -154,6 +158,8 @@ inline void render_gobj(HSD_GObj* cur, int i)
     HSD_GObj_804D7814 = saved;
 }
 
+extern HSD_GObj* Player_GetEntity(s32 slot);
+
 /// GObj_SetTextureCamera
 void HSD_GObj_80390ED0(HSD_GObj* gobj, u32 mask)
 {
@@ -169,7 +175,16 @@ void HSD_GObj_80390ED0(HSD_GObj* gobj, u32 mask)
                          cur = cur->next_gx)
                     {
                         if (cur->render_cb != NULL) {
+                            if (cur == Player_GetEntity(0)) {
+                                extern void ftCo_800C2600(HSD_GObj*, s32);
+                                ftCo_800C2600(cur, i);
+                                // continue;
+                                GXSetColorUpdate(GX_FALSE);
+                                special_render_pass = true;
+                            }
                             render_gobj(cur, i);
+                            special_render_pass = false;
+                            GXSetColorUpdate(GX_TRUE);
                         }
                     }
                 }
@@ -188,12 +203,21 @@ void HSD_GObj_80390FC0(void)
     HSD_GObj* saved;
     HSD_GObj* cur = HSD_GObj_804D7824[HSD_GObjLibInitData.gx_link_max + 1];
     while (cur != NULL) {
+        if (cur == Player_GetEntity(0)) {
+            extern void ftCo_800C2600(HSD_GObj*, s32);
+            ftCo_800C2600(cur, 0);
+            // continue;
+            GXSetColorUpdate(GX_FALSE);
+            special_render_pass = true;
+        }
         if (cur->render_cb != NULL) {
             saved = HSD_GObj_804D7818;
             HSD_GObj_804D7818 = cur;
             cur->render_cb(cur, 0);
             HSD_GObj_804D7818 = saved;
         }
+        special_render_pass = false;
+        GXSetColorUpdate(GX_TRUE);
         cur = cur->next_gx;
     }
 }

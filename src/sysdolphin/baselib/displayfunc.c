@@ -528,7 +528,7 @@ void HSD_EraseRect(f32 top, f32 bottom, f32 left, f32 right, f32 z,
     };
     GXColor color;
     u8 _[4];
-
+    return;
     if (!enable_color && !enable_alpha && !enable_depth) {
         return;
     }

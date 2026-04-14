@@ -6,7 +6,11 @@
 
 #include "gm_unsplit.h"
 
+#include "cm/types.h"
 #include "db/db.h"
+#include "dolphin/gx/GXEnum.h"
+#include "dolphin/gx/GXGeometry.h"
+#include "dolphin/gx/GXTexture.h"
 #include "gm/gmscdata.h"
 #include "if/ifcoget.h"
 #include "lb/lb_00F9.h"
@@ -23,6 +27,8 @@
 #include <baselib/particle.h>
 #include <baselib/perf.h>
 #include <baselib/sobjlib.h>
+
+int special_render_pass;
 
 static u64 gm_803DA888[8] = {
     0, 0x82FFFA, 0, 0x8EFFFA, 0x800FFA, 0x808FFA, 0x800FFA, 0,
@@ -258,6 +264,8 @@ inline u64 maybe_gm_801A48A4(u8 i)
     }
 }
 
+extern HSD_GObj* Player_GetEntity(s32 slot);
+
 void gm_801A4D34(void (*arg0)(void), MinorSceneInfo* arg1)
 {
     int pad_queue_count;
@@ -360,6 +368,80 @@ void gm_801A4D34(void (*arg0)(void), MinorSceneInfo* arg1)
         GXInvalidateVtxCache();
         GXInvalidateTexAll();
         HSD_StartRender(HSD_RP_SCREEN);
+        do {
+            HSD_GObj *player0, *saved1, *saved2;
+            Mtx ortho, ident;
+            GXTexObj texobj;
+            static u16 checkerboard_texture[] ATTRIBUTE_ALIGN(
+                32) = { 0xF81F, 0, 0, 0, 0, 0xF81F };
+            static const GXColor bg = { 0, 0xFF, 0, 0xFF };
+            static const float TEXTURE_SCALE = 15;
+            extern int special_render_pass;
+            extern void HSD_StateInvalidate(int mask);
+            extern Camera cm_80452C68;
+            extern void __GXInitGX(void);
+            player0 = Player_GetEntity(0);
+            if (player0 == NULL || player0->render_cb == NULL) {
+                break;
+            }
+            GXSetCopyClear(bg, GX_MAX_Z24);
+            GXSetColorUpdate(GX_FALSE);
+            HSD_CObjSetCurrent(cm_80452C68.gobj->hsd_obj);
+            special_render_pass = true;
+            saved1 = HSD_GObj_804D7818;
+            saved2 = HSD_GObj_804D7814;
+            HSD_GObj_804D7818 = player0;
+            HSD_GObj_804D7814 = player0;
+            player0->render_cb(player0, 0);
+            HSD_GObj_804D7818 = saved1;
+            HSD_GObj_804D7814 = saved2;
+            special_render_pass = false;
+            GXSetColorUpdate(GX_TRUE);
+            HSD_CObjEndCurrent();
+            __GXInitGX();
+            GXClearVtxDesc();
+            GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+            GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+            GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+            GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+            GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+            GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
+            GXSetNumChans(1);
+            GXSetNumTexGens(1);
+            GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+            GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
+            GXInitTexObj(&texobj, checkerboard_texture, 2, 2, GX_TF_RGB565,
+                         GX_REPEAT, GX_REPEAT, GX_FALSE);
+            GXInitTexObjLOD(&texobj, GX_NEAR_MIP_NEAR, GX_NEAR, 0, 0, 0,
+                            GX_TRUE, GX_FALSE, GX_ANISO_1);
+            GXLoadTexObj(&texobj, GX_TEXMAP0);
+            GXSetCullMode(GX_CULL_NONE);
+            GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
+            MTXOrtho(ortho, 0, 1, 0, 1, 0, 1);
+            GXSetProjection(ortho, GX_ORTHOGRAPHIC);
+            MTXIdentity(ident);
+            GXLoadPosMtxImm(ident, GX_PNMTX0);
+            GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+            GXPosition3f32(0, 0, 0);
+            GXColor4u8(255, 255, 255, 255);
+            GXTexCoord2f32(0, 0);
+            GXPosition3f32(1, 0, 0);
+            GXColor4u8(255, 255, 255, 255);
+            GXTexCoord2f32(TEXTURE_SCALE, 0);
+            GXPosition3f32(1, 1, 0);
+            GXColor4u8(255, 255, 255, 255);
+            GXTexCoord2f32(TEXTURE_SCALE, TEXTURE_SCALE);
+            GXPosition3f32(0, 1, 0);
+            GXColor4u8(255, 255, 255, 255);
+            GXTexCoord2f32(0, TEXTURE_SCALE);
+            GXEnd();
+            HSD_StateInvalidate(-1);
+            GXInvalidateVtxCache();
+            GXInvalidateTexAll();
+        } while (0);
+        if (Player_GetEntity(0) == NULL ||
+            Player_GetEntity(0)->render_cb == NULL)
+            ;
         HSD_GObj_80390FC0();
         HSD_Init_803755A8();
         HSD_PerfSetDrawTime();

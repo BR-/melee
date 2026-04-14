@@ -280,7 +280,7 @@ extern u32* __piReg;
 extern GXBool __GXinBegin;
 #endif
 
-static void __GXInitGX(void);
+void __GXInitGX(void);
 
 /* GXMisc.c */
 

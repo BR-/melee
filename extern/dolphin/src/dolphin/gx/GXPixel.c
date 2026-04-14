@@ -168,6 +168,10 @@ void GXSetBlendMode(GXBlendMode type, GXBlendFactor src_factor, GXBlendFactor ds
 
 void GXSetColorUpdate(GXBool update_enable)
 {
+    extern int special_render_pass;
+    if (special_render_pass) {
+        update_enable = GX_FALSE;
+    }
     CHECK_GXBEGIN(0x14F, "GXSetColorUpdate");
     SET_REG_FIELD(0x150, gx->cmode0, 1, 3, update_enable);
     GX_WRITE_RAS_REG(gx->cmode0);
