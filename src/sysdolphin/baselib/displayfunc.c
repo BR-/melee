@@ -35,7 +35,7 @@ HSD_ObjAllocData zlist_alloc_data;
 
 static void (*sptcl_callback)(s32, s32, s32, HSD_JObj*) = NULL;
 
-static GXColor erase_color = { 0, 0, 0, 0 };
+GXColor erase_color = { 0, 0, 0, 0 };
 
 static int zsort_listing = 0;
 static int zsort_sorting = 0;

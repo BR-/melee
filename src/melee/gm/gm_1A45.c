@@ -264,7 +264,43 @@ inline u64 maybe_gm_801A48A4(u8 i)
     }
 }
 
+int allow_clear_screen = true;
 extern HSD_GObj* Player_GetEntity(s32 slot);
+static void setup_gfx(void)
+{
+    HSD_GObj *player0, *saved1, *saved2;
+    float ortho[4][4], ident[4][4];
+    GXTexObj texobj;
+    static u16 checkerboard_texture[] ATTRIBUTE_ALIGN(
+        32) = { 0xF81F, 0, 0, 0, 0, 0xF81F };
+    static const GXColor bg = { 0, 0xFF, 0, 0xFF };
+    static const float TEXTURE_SCALE = 15;
+    extern int special_render_pass;
+    extern void HSD_StateInvalidate(int mask);
+    extern Camera cm_80452C68;
+    extern void __GXInitGX(void);
+    extern GXColor erase_color;
+    __GXInitGX();
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
+    GXSetNumChans(1);
+    GXSetNumTexGens(1);
+    GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+    GXInitTexObj(&texobj, checkerboard_texture, 2, 2, GX_TF_RGB565, GX_REPEAT,
+                 GX_REPEAT, GX_FALSE);
+    GXInitTexObjLOD(&texobj, GX_NEAR_MIP_NEAR, GX_NEAR, 0, 0, 0, GX_TRUE,
+                    GX_FALSE, GX_ANISO_1);
+    GXLoadTexObj(&texobj, GX_TEXMAP0);
+    GXSetCullMode(GX_CULL_NONE);
+    MTXOrtho(ortho, 0, 1, 0, 1, 0, 1);
+    GXSetProjection(ortho, GX_ORTHOGRAPHIC);
+    MTXIdentity(ident);
+    GXLoadPosMtxImm(ident, GX_PNMTX0);
+}
 
 void gm_801A4D34(void (*arg0)(void), MinorSceneInfo* arg1)
 {
@@ -370,7 +406,7 @@ void gm_801A4D34(void (*arg0)(void), MinorSceneInfo* arg1)
         HSD_StartRender(HSD_RP_SCREEN);
         do {
             HSD_GObj *player0, *saved1, *saved2;
-            Mtx ortho, ident;
+            float ortho[4][4], ident[4][4];
             GXTexObj texobj;
             static u16 checkerboard_texture[] ATTRIBUTE_ALIGN(
                 32) = { 0xF81F, 0, 0, 0, 0, 0xF81F };
@@ -380,11 +416,38 @@ void gm_801A4D34(void (*arg0)(void), MinorSceneInfo* arg1)
             extern void HSD_StateInvalidate(int mask);
             extern Camera cm_80452C68;
             extern void __GXInitGX(void);
+            extern GXColor erase_color;
             player0 = Player_GetEntity(0);
             if (player0 == NULL || player0->render_cb == NULL) {
                 break;
             }
             GXSetCopyClear(bg, GX_MAX_Z24);
+            allow_clear_screen = false;
+            // draw checkered background
+            setup_gfx();
+            GXSetAlphaUpdate(GX_ENABLE);
+            GXSetZMode(GX_TRUE, GX_ALWAYS, GX_TRUE);
+            GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+            GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
+            GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+            GXPosition3f32(0, 0, -1);
+            GXColor4u8(255, 255, 255, 255);
+            GXTexCoord2f32(0, 0);
+            GXPosition3f32(1, 0, -1);
+            GXColor4u8(255, 255, 255, 255);
+            GXTexCoord2f32(TEXTURE_SCALE, 0);
+            GXPosition3f32(1, 1, -1);
+            GXColor4u8(255, 255, 255, 255);
+            GXTexCoord2f32(TEXTURE_SCALE, TEXTURE_SCALE);
+            GXPosition3f32(0, 1, -1);
+            GXColor4u8(255, 255, 255, 255);
+            GXTexCoord2f32(0, TEXTURE_SCALE);
+            GXEnd();
+            // draw fighter
+            __GXInitGX();
+            HSD_StateInvalidate(-1);
+            GXInvalidateVtxCache();
+            GXInvalidateTexAll();
             GXSetColorUpdate(GX_FALSE);
             HSD_CObjSetCurrent(cm_80452C68.gobj->hsd_obj);
             special_render_pass = true;
@@ -398,43 +461,26 @@ void gm_801A4D34(void (*arg0)(void), MinorSceneInfo* arg1)
             special_render_pass = false;
             GXSetColorUpdate(GX_TRUE);
             HSD_CObjEndCurrent();
-            __GXInitGX();
-            GXClearVtxDesc();
-            GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
-            GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
-            GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
-            GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
-            GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
-            GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
-            GXSetNumChans(1);
-            GXSetNumTexGens(1);
-            GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
-            GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
-            GXInitTexObj(&texobj, checkerboard_texture, 2, 2, GX_TF_RGB565,
-                         GX_REPEAT, GX_REPEAT, GX_FALSE);
-            GXInitTexObjLOD(&texobj, GX_NEAR_MIP_NEAR, GX_NEAR, 0, 0, 0,
-                            GX_TRUE, GX_FALSE, GX_ANISO_1);
-            GXLoadTexObj(&texobj, GX_TEXMAP0);
-            GXSetCullMode(GX_CULL_NONE);
-            GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
-            MTXOrtho(ortho, 0, 1, 0, 1, 0, 1);
-            GXSetProjection(ortho, GX_ORTHOGRAPHIC);
-            MTXIdentity(ident);
-            GXLoadPosMtxImm(ident, GX_PNMTX0);
+            // draw normal background
+            setup_gfx();
+            GXSetZMode(GX_TRUE, GX_EQUAL, GX_FALSE);
+            GXSetVtxDesc(GX_VA_TEX0, GX_NONE);
+            GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
             GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-            GXPosition3f32(0, 0, 0);
-            GXColor4u8(255, 255, 255, 255);
-            GXTexCoord2f32(0, 0);
-            GXPosition3f32(1, 0, 0);
-            GXColor4u8(255, 255, 255, 255);
-            GXTexCoord2f32(TEXTURE_SCALE, 0);
-            GXPosition3f32(1, 1, 0);
-            GXColor4u8(255, 255, 255, 255);
-            GXTexCoord2f32(TEXTURE_SCALE, TEXTURE_SCALE);
-            GXPosition3f32(0, 1, 0);
-            GXColor4u8(255, 255, 255, 255);
-            GXTexCoord2f32(0, TEXTURE_SCALE);
+            GXPosition3f32(0, 0, -1);
+            GXColor4u8(erase_color.r, erase_color.g, erase_color.b,
+                       erase_color.a);
+            GXPosition3f32(1, 0, -1);
+            GXColor4u8(erase_color.r, erase_color.g, erase_color.b,
+                       erase_color.a);
+            GXPosition3f32(1, 1, -1);
+            GXColor4u8(erase_color.r, erase_color.g, erase_color.b,
+                       erase_color.a);
+            GXPosition3f32(0, 1, -1);
+            GXColor4u8(erase_color.r, erase_color.g, erase_color.b,
+                       erase_color.a);
             GXEnd();
+            __GXInitGX();
             HSD_StateInvalidate(-1);
             GXInvalidateVtxCache();
             GXInvalidateTexAll();
@@ -444,6 +490,7 @@ void gm_801A4D34(void (*arg0)(void), MinorSceneInfo* arg1)
             ;
         HSD_GObj_80390FC0();
         HSD_Init_803755A8();
+        allow_clear_screen = true;
         HSD_PerfSetDrawTime();
         HSD_VICopyXFBAsync(HSD_RP_SCREEN);
         if (temp_r25->unk_4 != -2U) {
