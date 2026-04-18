@@ -4269,7 +4269,7 @@ Vec3* Camera_8003019C(void)
     return &ftLib_80086B74(Player_GetEntity(cm_80453004.ply_slot))->x1C;
 }
 
-static void fn_800301D0(HSD_GObj* gobj, int arg1)
+void fn_800301D0(HSD_GObj* gobj, int arg1)
 {
     HSD_CObj* cobj;
     PAD_STACK(56);

@@ -515,15 +515,9 @@ u32 GXSetDispCopyYScale(f32 vscale)
     return ht * fScale;
 }
 
-extern int allow_clear_screen;
-
 void GXSetCopyClear(GXColor clear_clr, u32 clear_z)
 {
     u32 reg;
-
-    if (!allow_clear_screen) {
-        return;
-    }
 
     CHECK_GXBEGIN(0x4C4, "GXSetCopyClear");
     ASSERTMSGLINE(0x4C6, clear_z <= 0xFFFFFF,

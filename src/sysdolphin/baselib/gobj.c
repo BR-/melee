@@ -176,8 +176,8 @@ void HSD_GObj_80390ED0(HSD_GObj* gobj, u32 mask)
                     {
                         if (cur->render_cb != NULL) {
                             if (cur == Player_GetEntity(0)) {
-                                extern void ftCo_800C2600(HSD_GObj*, s32);
-                                ftCo_800C2600(cur, i);
+                                // extern void ftCo_800C2600(HSD_GObj*, s32);
+                                // ftCo_800C2600(cur, i);
                                 // continue;
                                 GXSetColorUpdate(GX_FALSE);
                                 special_render_pass = true;
@@ -198,26 +198,32 @@ void HSD_GObj_80390ED0(HSD_GObj* gobj, u32 mask)
 }
 
 /// GObj_RunGXLinkMaxCallbacks
+int in_main_render_pass = false;
 void HSD_GObj_80390FC0(void)
 {
     HSD_GObj* saved;
     HSD_GObj* cur = HSD_GObj_804D7824[HSD_GObjLibInitData.gx_link_max + 1];
     while (cur != NULL) {
-        if (cur == Player_GetEntity(0)) {
-            extern void ftCo_800C2600(HSD_GObj*, s32);
-            ftCo_800C2600(cur, 0);
-            // continue;
-            GXSetColorUpdate(GX_FALSE);
-            special_render_pass = true;
-        }
+        // if (cur == Player_GetEntity(0)) {
+        //     // extern void ftCo_800C2600(HSD_GObj*, s32);
+        //     // ftCo_800C2600(cur, 0);
+        //     // continue;
+        //     GXSetColorUpdate(GX_FALSE);
+        //     special_render_pass = true;
+        // }
         if (cur->render_cb != NULL) {
+            extern void fn_800301D0(HSD_GObj * gobj, int arg1);
             saved = HSD_GObj_804D7818;
             HSD_GObj_804D7818 = cur;
+            if (cur->render_cb == &fn_800301D0) {
+                in_main_render_pass = true;
+            }
             cur->render_cb(cur, 0);
+            in_main_render_pass = false;
             HSD_GObj_804D7818 = saved;
         }
-        special_render_pass = false;
-        GXSetColorUpdate(GX_TRUE);
+        // special_render_pass = false;
+        // GXSetColorUpdate(GX_TRUE);
         cur = cur->next_gx;
     }
 }

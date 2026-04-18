@@ -528,7 +528,9 @@ void HSD_EraseRect(f32 top, f32 bottom, f32 left, f32 right, f32 z,
     };
     GXColor color;
     u8 _[4];
-    return;
+    extern int in_main_render_pass;
+    extern void do_that_funky_render(void);
+
     if (!enable_color && !enable_alpha && !enable_depth) {
         return;
     }
@@ -594,6 +596,10 @@ void HSD_EraseRect(f32 top, f32 bottom, f32 left, f32 right, f32 z,
     GXSetZTexture(GX_ZT_DISABLE, GX_TF_Z8, 0);
 
     HSD_StateInvalidate(HSD_STATE_ALL);
+
+    if (in_main_render_pass) {
+        do_that_funky_render();
+    }
 }
 
 void _HSD_DispForgetMemory(void* lo, void* hi)
