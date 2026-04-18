@@ -176,8 +176,8 @@ void HSD_GObj_80390ED0(HSD_GObj* gobj, u32 mask)
                     {
                         if (cur->render_cb != NULL) {
                             if (cur == Player_GetEntity(0)) {
-                                // extern void ftCo_800C2600(HSD_GObj*, s32);
-                                // ftCo_800C2600(cur, i);
+                                extern void ftCo_800C2600(HSD_GObj*, s32);
+                                ftCo_800C2600(cur, i);
                                 // continue;
                                 GXSetColorUpdate(GX_FALSE);
                                 special_render_pass = true;
