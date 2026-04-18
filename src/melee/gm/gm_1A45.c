@@ -391,6 +391,176 @@ void do_that_funky_render(void)
     HSD_CObjSetCurrent(cm_80452C68.gobj->hsd_obj);
 }
 
+int doing_that_funky_render_lowpoly = false;
+void do_that_funky_render_lowpoly(void)
+{
+    HSD_GObj *player0, *saved1, *saved2;
+    float ortho[4][4], ident[4][4];
+    GXTexObj texobj;
+    static u16 checkerboard_texture[] ATTRIBUTE_ALIGN(
+        32) = { 0xF81F, 0, 0, 0, 0, 0xF81F };
+    static const GXColor bg = { 0, 0xFF, 0, 0xFF };
+    static const float TEXTURE_SCALE = 15;
+    extern int special_render_pass;
+    extern void HSD_StateInvalidate(int mask);
+    extern Camera cm_80452C68;
+    extern void __GXInitGX(void);
+    extern GXColor erase_color;
+    player0 = Player_GetEntity(0);
+    if (player0 == NULL) {
+        return;
+    }
+    GXSetCopyClear(bg, GX_MAX_Z24);
+    // draw checkered background
+    setup_gfx();
+    GXSetAlphaUpdate(GX_ENABLE);
+    GXSetZMode(GX_TRUE, GX_ALWAYS, GX_TRUE);
+    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+    GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
+    GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+    GXPosition3f32(0, 0, -1);
+    GXColor4u8(255, 255, 255, 255);
+    GXTexCoord2f32(0, 0);
+    GXPosition3f32(1, 0, -1);
+    GXColor4u8(255, 255, 255, 255);
+    GXTexCoord2f32(TEXTURE_SCALE, 0);
+    GXPosition3f32(1, 1, -1);
+    GXColor4u8(255, 255, 255, 255);
+    GXTexCoord2f32(TEXTURE_SCALE, TEXTURE_SCALE);
+    GXPosition3f32(0, 1, -1);
+    GXColor4u8(255, 255, 255, 255);
+    GXTexCoord2f32(0, TEXTURE_SCALE);
+    GXEnd();
+    // // draw fighter
+    // __GXInitGX();
+    // HSD_StateInvalidate(-1);
+    // GXInvalidateVtxCache();
+    // GXInvalidateTexAll();
+    // GXSetColorUpdate(GX_FALSE);
+    // {
+    //     extern HSD_CObj *lowpoly_cobj;
+    //     HSD_CObjSetCurrent(lowpoly_cobj);
+    // }
+    // doing_that_funky_render_lowpoly = true;
+    // {
+    //     extern void ftDrawCommon_80080C28(HSD_GObj*, int);
+    //     ftDrawCommon_80080C28(player0, 0);
+    //     ftDrawCommon_80080C28(player0, 1);
+    //     ftDrawCommon_80080C28(player0, 2);
+    // }
+    // doing_that_funky_render_lowpoly = false;
+    // GXSetColorUpdate(GX_TRUE);
+    // HSD_CObjEndCurrent();
+    // // draw normal background
+    // setup_gfx();
+    // GXSetZMode(GX_TRUE, GX_EQUAL, GX_FALSE);
+    // GXSetVtxDesc(GX_VA_TEX0, GX_NONE);
+    // GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
+    // GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+    // GXPosition3f32(0, 0, -1);
+    // GXColor4u8(0, 0, 0, 0xFF);
+    // GXPosition3f32(1, 0, -1);
+    // GXColor4u8(0, 0, 0, 0xFF);
+    // GXPosition3f32(1, 1, -1);
+    // GXColor4u8(0, 0, 0, 0xFF);
+    // GXPosition3f32(0, 1, -1);
+    // GXColor4u8(0, 0, 0, 0xFF);
+    // GXEnd();
+    // __GXInitGX();
+    // HSD_StateInvalidate(-1);
+    // GXInvalidateVtxCache();
+    // GXInvalidateTexAll();
+    // {
+    //     extern HSD_CObj *lowpoly_cobj;
+    //     HSD_CObjSetCurrent(lowpoly_cobj);
+    // }
+}
+
+void do_that_funky_render_reflection(void)
+{
+    HSD_GObj *player0, *saved1, *saved2;
+    float ortho[4][4], ident[4][4];
+    GXTexObj texobj;
+    static u16 checkerboard_texture[] ATTRIBUTE_ALIGN(
+        32) = { 0xF81F, 0, 0, 0, 0, 0xF81F };
+    static const GXColor bg = { 0, 0xFF, 0, 0xFF };
+    static const float TEXTURE_SCALE = 120;
+    extern int special_render_pass;
+    extern void HSD_StateInvalidate(int mask);
+    extern Camera cm_80452C68;
+    extern void __GXInitGX(void);
+    extern GXColor erase_color;
+    player0 = Player_GetEntity(0);
+    if (player0 == NULL || player0->render_cb == NULL) {
+        return;
+    }
+    GXSetCopyClear(bg, GX_MAX_Z24);
+    // draw checkered background
+    setup_gfx();
+    GXSetAlphaUpdate(GX_ENABLE);
+    GXSetZMode(GX_TRUE, GX_ALWAYS, GX_TRUE);
+    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+    GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
+    GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+    GXPosition3f32(0, 0, -1);
+    GXColor4u8(255, 255, 255, 255);
+    GXTexCoord2f32(0, 0);
+    GXPosition3f32(1, 0, -1);
+    GXColor4u8(255, 255, 255, 255);
+    GXTexCoord2f32(TEXTURE_SCALE, 0);
+    GXPosition3f32(1, 1, -1);
+    GXColor4u8(255, 255, 255, 255);
+    GXTexCoord2f32(TEXTURE_SCALE, TEXTURE_SCALE);
+    GXPosition3f32(0, 1, -1);
+    GXColor4u8(255, 255, 255, 255);
+    GXTexCoord2f32(0, TEXTURE_SCALE);
+    GXEnd();
+    // draw fighter
+    __GXInitGX();
+    HSD_StateInvalidate(-1);
+    GXInvalidateVtxCache();
+    GXInvalidateTexAll();
+    GXSetColorUpdate(GX_FALSE);
+    {
+        extern HSD_CObj* reflection_cobj;
+        HSD_CObjSetCurrent(reflection_cobj);
+    }
+    special_render_pass = true;
+    saved1 = HSD_GObj_804D7818;
+    saved2 = HSD_GObj_804D7814;
+    HSD_GObj_804D7818 = player0;
+    HSD_GObj_804D7814 = player0;
+    player0->render_cb(player0, 0);
+    HSD_GObj_804D7818 = saved1;
+    HSD_GObj_804D7814 = saved2;
+    special_render_pass = false;
+    GXSetColorUpdate(GX_TRUE);
+    HSD_CObjEndCurrent();
+    // draw normal background
+    setup_gfx();
+    GXSetZMode(GX_TRUE, GX_EQUAL, GX_FALSE);
+    GXSetVtxDesc(GX_VA_TEX0, GX_NONE);
+    GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
+    GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+    GXPosition3f32(0, 0, -1);
+    GXColor4u8(0xFF, 0xFF, 0xFF, 0xFF);
+    GXPosition3f32(1, 0, -1);
+    GXColor4u8(0xFF, 0xFF, 0xFF, 0xFF);
+    GXPosition3f32(1, 1, -1);
+    GXColor4u8(0xFF, 0xFF, 0xFF, 0xFF);
+    GXPosition3f32(0, 1, -1);
+    GXColor4u8(0xFF, 0xFF, 0xFF, 0xFF);
+    GXEnd();
+    __GXInitGX();
+    HSD_StateInvalidate(-1);
+    GXInvalidateVtxCache();
+    GXInvalidateTexAll();
+    {
+        extern HSD_CObj* reflection_cobj;
+        HSD_CObjSetCurrent(reflection_cobj);
+    }
+}
+
 void gm_801A4D34(void (*arg0)(void), MinorSceneInfo* arg1)
 {
     int pad_queue_count;

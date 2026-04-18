@@ -567,9 +567,13 @@ void HSD_JObjAnimAll(HSD_JObj* jobj)
     }
 }
 
+extern int in_lowpoly_render_pass, doing_that_funky_render_lowpoly;
 void HSD_JObjDispAll(HSD_JObj* jobj, Mtx vmtx, u32 flags, u32 rendermode)
 {
     MtxPtr new_var = vmtx;
+    if (in_lowpoly_render_pass && !doing_that_funky_render_lowpoly) {
+        return;
+    }
     if (jobj != NULL) {
         if (jobj->flags & JOBJ_INSTANCE) {
             if (!(jobj->flags & JOBJ_HIDDEN)) {

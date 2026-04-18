@@ -528,8 +528,11 @@ void HSD_EraseRect(f32 top, f32 bottom, f32 left, f32 right, f32 z,
     };
     GXColor color;
     u8 _[4];
-    extern int in_main_render_pass;
+    extern int in_main_render_pass, in_lowpoly_render_pass,
+        in_reflection_render_pass;
     extern void do_that_funky_render(void);
+    extern void do_that_funky_render_lowpoly(void);
+    extern void do_that_funky_render_reflection(void);
 
     if (!enable_color && !enable_alpha && !enable_depth) {
         return;
@@ -599,6 +602,12 @@ void HSD_EraseRect(f32 top, f32 bottom, f32 left, f32 right, f32 z,
 
     if (in_main_render_pass) {
         do_that_funky_render();
+    }
+    if (in_lowpoly_render_pass) {
+        do_that_funky_render_lowpoly();
+    }
+    if (in_reflection_render_pass) {
+        do_that_funky_render_reflection();
     }
 }
 

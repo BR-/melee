@@ -199,6 +199,10 @@ void HSD_GObj_80390ED0(HSD_GObj* gobj, u32 mask)
 
 /// GObj_RunGXLinkMaxCallbacks
 int in_main_render_pass = false;
+int in_lowpoly_render_pass = false;
+int in_reflection_render_pass = false;
+HSD_CObj* lowpoly_cobj;
+HSD_CObj* reflection_cobj;
 void HSD_GObj_80390FC0(void)
 {
     HSD_GObj* saved;
@@ -213,13 +217,23 @@ void HSD_GObj_80390FC0(void)
         // }
         if (cur->render_cb != NULL) {
             extern void fn_800301D0(HSD_GObj * gobj, int arg1);
+            extern void ifMagnify_802FBBDC(HSD_GObj * gobj, int arg1);
+            extern void grIzumi_801CCEA0(HSD_GObj * gobj, int arg1);
             saved = HSD_GObj_804D7818;
             HSD_GObj_804D7818 = cur;
             if (cur->render_cb == &fn_800301D0) {
                 in_main_render_pass = true;
+            } else if (cur->render_cb == &ifMagnify_802FBBDC) {
+                in_lowpoly_render_pass = true;
+                lowpoly_cobj = cur->hsd_obj;
+            } else if (cur->render_cb == &grIzumi_801CCEA0) {
+                in_reflection_render_pass = true;
+                reflection_cobj = cur->hsd_obj;
             }
             cur->render_cb(cur, 0);
             in_main_render_pass = false;
+            in_lowpoly_render_pass = false;
+            in_reflection_render_pass = false;
             HSD_GObj_804D7818 = saved;
         }
         // special_render_pass = false;
